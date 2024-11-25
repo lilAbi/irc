@@ -1,12 +1,10 @@
 #include <iostream>
 #include <string>
-#include "spdlog/spdlog.h"
-#include <boost/asio.hpp>
+#include "client.h"
 
 int main() {
     //create io context
-    boost::asio::io_context io_context;
-
+    //Client ircClient("192.168.50.226", 6667);
     //initialize irc class and sub components
 
     //set server ip
