@@ -26,5 +26,6 @@ add_executable(irc ${sources})
 target_link_libraries(irc PUBLIC
         spdlog::spdlog
         boost::boost
+        "libws2_32.a"
 )
 
