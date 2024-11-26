@@ -4,7 +4,9 @@
 
 int main() {
     //create io context
-    //Client ircClient("192.168.50.226", 6667);
+    Client ircClient("192.168.50.226", 6667);
+    ircClient.connect();
+    ircClient.close();
     //initialize irc class and sub components
 
     //set server ip
@@ -14,6 +16,7 @@ int main() {
     //ircClient
 
     //starts input loop
+    /*
     while(true){
         std::string message;
         std::cout << "[~]> ";
@@ -22,6 +25,7 @@ int main() {
         spdlog::info("{}", message);
         if (message == "exit") break;
     }
+     */
 
     return 0;
 }

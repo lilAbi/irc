@@ -19,6 +19,10 @@ void Client::connect() {
     socket.connect(endpoint);
     std::string severMessage = receiveResponse();
     spdlog::info("Server Message: {}", severMessage);
+    severMessage = receiveResponse();
+    spdlog::info("Server Message: {}", severMessage);
+    severMessage = receiveResponse();
+    spdlog::info("Server Message: {}", severMessage);
 }
 
 std::string Client::receiveResponse() {
