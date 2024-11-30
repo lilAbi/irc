@@ -1,7 +1,15 @@
 #ifndef IRC_CLIENT_H
 #define IRC_CLIENT_H
+
 #include "boost/asio.hpp"
 #include "spdlog/spdlog.h"
+#include "session.h"
+
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
+#include <map>
 //manages the start up and shutdown processes
 //coordinates interation between components
 //client initializes the ConnectionManager, UserInterface, StateManager, and EventLoop
@@ -9,20 +17,35 @@
 
 class Client {
 public:
-    //set endpoint
-    Client(const std::string& ipAddress, unsigned short port);
+    explicit Client(int numThreads);
+    ~Client() = default;
+
+    //remove ability to copy/move
+    Client(const Client& client) = delete;
+    Client(Client&& client) noexcept = delete;
+    Client& operator=(const Client& rhs) = delete;
+    Client& operator=(Client&& rhs) noexcept = delete;
+
+public:
+    //passive socket listen for updates
+    void cancelRequest(int requestID);
     void close();
-    void connect();
+
+    //passive socket listening and updating
+    void updateChatLog(const std::string& ipAddress, unsigned short port, int requestID);
 
 private:
-    std::string receiveResponse();
-    void sendRequest(const std::string request);
+    void onRequestComplete(std::shared_ptr<Session> session);
 
 private:
+    std::jthread chatLogUpdateThread;
     boost::asio::io_service ioServiceContext;
-    boost::asio::ip::tcp::endpoint endpoint;
-    boost::asio::ip::tcp::socket socket;
+    boost::asio::executor_work_guard<boost::asio::io_context::executor_type> workGuard;
+    std::mutex activeSessionGuard;
+    std::map<int, std::shared_ptr<Session>> sessions;
+    std::vector<std::unique_ptr<std::thread>> threads;
 };
+
 
 
 #endif //IRC_CLIENT_H

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 project(irc)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fexperimental-library")
 set(CMAKE_EXE_LINKER_FLAGS "")
 
 include_directories(src)
@@ -23,9 +23,16 @@ file(GLOB sources CONFIGURE_DEPENDS
 
 add_executable(irc ${sources})
 
-target_link_libraries(irc PUBLIC
-        spdlog::spdlog
-        boost::boost
-        "libws2_32.a"
-)
+if(WIN32)
+    target_link_libraries(irc PUBLIC
+            spdlog::spdlog
+            boost::boost
+            "libws2_32.a"
+    )
+else()
+    target_link_libraries(irc PUBLIC
+            spdlog::spdlog
+            boost::boost
+    )
+endif()
 

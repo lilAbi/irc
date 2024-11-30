@@ -4,9 +4,9 @@
 
 int main() {
     //create io context
-    Client ircClient("192.168.50.226", 6667);
-    ircClient.connect();
-    ircClient.close();
+    //Client ircClient("192.168.50.226", 6667);
+    //ircClient.connect();
+    //ircClient.close();
     //initialize irc class and sub components
 
     //set server ip

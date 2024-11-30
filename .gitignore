@@ -1,0 +1,5 @@
+cmake-build-release-clang
+CMakeUserPresets.json
+cmake-build-release-gcc
+.idea
+.DS_Store

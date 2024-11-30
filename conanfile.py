@@ -9,8 +9,8 @@ class ImGuiExample(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     def requirements(self):
-        self.requires("spdlog/1.13.0")
-        self.requires("boost/1.85.0")
+        self.requires("spdlog/1.14.1")
+        self.requires("boost/1.86.0")
 
     def generate(self):
         toolchain = CMakeToolchain(self)
@@ -22,7 +22,9 @@ class ImGuiExample(ConanFile):
         if self.settings.os == "Windows":
             self.options["boost"].without_stacktrace = "True"
             self.options["boost"].with_stacktrace_backtrace = "False"
-        #if self.settings.os == "Macos":
+        if self.settings.os == "Macos":
+            self.options["boost"].without_stacktrace = "True"
+            self.options["boost"].with_stacktrace_backtrace = "False"
     def layout(self):
         cmake_layout(self)
 
