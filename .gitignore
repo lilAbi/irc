@@ -1,5 +1,6 @@
 cmake-build-release-clang
 CMakeUserPresets.json
 cmake-build-release-gcc
+cmake-build-release-local-mingw
 .idea
 .DS_Store

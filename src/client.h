@@ -34,7 +34,7 @@ public:
     //passive socket listening and updating
     void listenOnPort(const std::string& ipAddress, unsigned short port, int requestID);
 
-    void sendRequest(const std::string& ipAddress, unsigned short port, int requestID);
+    void sendRequest(const std::string& ipAddress, unsigned short port, int requestID, std::string payload);
 
 private:
     void onRequestComplete(std::shared_ptr<Session> session);

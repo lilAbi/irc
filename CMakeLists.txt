@@ -2,7 +2,15 @@ cmake_minimum_required(VERSION 3.28)
 project(irc)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fexperimental-library")
+if(WIN32)
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+else()
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -fexperimental-library")
+
+endif()
+
+
 set(CMAKE_EXE_LINKER_FLAGS "")
 
 include_directories(src)
@@ -28,6 +36,7 @@ if(WIN32)
             spdlog::spdlog
             boost::boost
             "libws2_32.a"
+            "wsock32.lib"
     )
 else()
     target_link_libraries(irc PUBLIC

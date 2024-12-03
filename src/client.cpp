@@ -97,8 +97,8 @@ void Client::listenOnPort(const std::string &ipAddress, unsigned short port, int
     sessions[requestID] = session;
 }
 
-void Client::sendRequest(const std::string &ipAddress, unsigned short port, int requestID) {
-    std::shared_ptr<Session> session = std::make_shared<Session>(ioServiceContext, ipAddress, port, " ", requestID, handler);
+void Client::sendRequest(const std::string &ipAddress, unsigned short port, int requestID, std::string payload) {
+    std::shared_ptr<Session> session = std::make_shared<Session>(ioServiceContext, ipAddress, port, payload, requestID, handler);
 
     session->socket.open(session->endpoint.protocol());
 
@@ -106,8 +106,35 @@ void Client::sendRequest(const std::string &ipAddress, unsigned short port, int 
         if (onAsyncConnectEC.value() != 0) {
             session->errorCode = onAsyncConnectEC;
             spdlog::info("connected");
+            onRequestComplete(session);
             return;
         }
+
+
+        boost::asio::async_write(
+                session->socket, boost::asio::buffer(session->response), [this, session] (const boost::system::error_code& errorCode, std::size_t){
+                    if (errorCode.value() != 0) {
+                        session->errorCode = errorCode;
+                        onRequestComplete(session);
+                        return;
+                    }
+
+                    boost::asio::async_read_until(
+                            session->socket, session->responseBuffer, 'n', [this, session] (const boost::system::error_code& errorCode, std::size_t) {
+                                if (errorCode.value() != 0) {
+                                    session->errorCode = errorCode;
+                                } else {
+                                    std::istream strm{&session->responseBuffer};
+                                    std::getline(strm, session->response);
+                                }
+                                onRequestComplete(session);
+                    });
+
+
+        });
+
+
+
 
     });
 

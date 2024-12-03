@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "client.h"
+#include "synchapi.h"
 
 int main() {
     //create io context
@@ -17,9 +18,10 @@ int main() {
 
 
     Client client{1};
-    //client.listenOnPort("0.0.0.0", 6667, 1);
-    client.sendRequest("192.168.50.226", 6667, 2);
-
+    client.listenOnPort("0.0.0.0", 6667, 1);
+    client.sendRequest("192.168.50.226", 6667, 2, "CAP LS 302");
+    client.sendRequest("192.168.50.226", 6667, 3, "NICK dan");
+    client.sendRequest("192.168.50.226", 6667, 4, "USER d * 0 :This is a really good name");
 
     sleep(100);
 
