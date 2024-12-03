@@ -15,6 +15,14 @@ int main() {
     //client ircClient{boost::asio::io, server, ip}
     //ircClient
 
+
+    Client client{1};
+    //client.listenOnPort("0.0.0.0", 6667, 1);
+    client.sendRequest("192.168.50.226", 6667, 2);
+
+
+    sleep(100);
+
     //starts input loop
     /*
     while(true){

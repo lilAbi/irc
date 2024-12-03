@@ -53,39 +53,65 @@ void Client::onRequestComplete(std::shared_ptr<Session> session) {
     session->callback(session->requestID, session->response, session->errorCode);
 }
 
-void Client::updateChatLog(const std::string &ipAddress, unsigned short port, int requestID) {
+void Client::listenOnPort(const std::string &ipAddress, unsigned short port, int requestID) {
     //create session
     std::shared_ptr<Session> session = std::make_shared<Session>(ioServiceContext, ipAddress, port, " ", requestID, handler);
 
     //listens for incoming connections
-    boost::asio::ip::tcp::acceptor acceptor(ioServiceContext, session->endpoint);
     spdlog::info("Server is listening on port: {}", port);
+    boost::asio::ip::tcp::acceptor acceptor(ioServiceContext, session->endpoint);
 
-    //detach a thread
-    chatLogUpdateThread = std::move(std::jthread([](std::shared_ptr<Session> session, boost::asio::ip::tcp::acceptor acceptor){
+    chatLogUpdateThread = std::move(std::jthread([session](boost::asio::ip::tcp::acceptor acceptor){
 
         std::string strBuffer;
         boost::asio::dynamic_string_buffer dynamicBuffer = boost::asio::dynamic_buffer(strBuffer);
 
         for(;;) {
+            //check if session should be stopped
+
             //wait for the it to become ready to read
+            spdlog::info("waiting");
             acceptor.wait(boost::asio::ip::tcp::acceptor::wait_type::wait_read);
 
             //async wait for a incoming connection
-            acceptor.async_accept(session->socket, [session, dynamicBuffer](const boost::system::error_code &err) {
+            acceptor.async_accept(session->socket, [session, &dynamicBuffer, &strBuffer](const boost::system::error_code &err) {
+                spdlog::info("accepted");
                 if (!err) {
-                    //session->socket.read_some(dynamicBuffer)
+                    //read data from socket
+                    session->socket.read_some(dynamicBuffer.data(0, dynamicBuffer.size()));
+                    //print response
+                    spdlog::info("response: {}", strBuffer);
+                    //clear buffer
+                    dynamicBuffer.shrink(0);
                 }
             });
-            //empty buffer
-            strBuffer.clear();
+
         }
 
-    }, session, std::move(acceptor)));
-
+    }, std::move(acceptor)));
+    //detach a thread
     chatLogUpdateThread.detach();
 
     //add session to map
     std::unique_lock<std::mutex> lock{activeSessionGuard};
     sessions[requestID] = session;
+}
+
+void Client::sendRequest(const std::string &ipAddress, unsigned short port, int requestID) {
+    std::shared_ptr<Session> session = std::make_shared<Session>(ioServiceContext, ipAddress, port, " ", requestID, handler);
+
+    session->socket.open(session->endpoint.protocol());
+
+    session->socket.async_connect(session->endpoint, [this, session](const boost::system::error_code& onAsyncConnectEC){
+        if (onAsyncConnectEC.value() != 0) {
+            session->errorCode = onAsyncConnectEC;
+            spdlog::info("connected");
+            return;
+        }
+
+    });
+
+
+    //lock session guard
+    //add session to map
 }

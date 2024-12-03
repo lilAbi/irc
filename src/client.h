@@ -32,7 +32,9 @@ public:
     void close();
 
     //passive socket listening and updating
-    void updateChatLog(const std::string& ipAddress, unsigned short port, int requestID);
+    void listenOnPort(const std::string& ipAddress, unsigned short port, int requestID);
+
+    void sendRequest(const std::string& ipAddress, unsigned short port, int requestID);
 
 private:
     void onRequestComplete(std::shared_ptr<Session> session);
