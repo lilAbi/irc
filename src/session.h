@@ -16,13 +16,13 @@ struct Session {
             std::string req, unsigned int id, RequestCallbackFunc func) :
             socket(ioService),
             endpoint(boost::asio::ip::address::from_string(rawIpAddress), port),
-            request(std::move(req)),
+            payload(std::move(req)),
             requestID{id},
             callback{func} {};
 
     boost::asio::ip::tcp::socket socket;
     boost::asio::ip::tcp::endpoint endpoint;
-    std::string request;    //string to hold request to send over socket
+    std::string payload;    //string to hold request to send over socket
 
     boost::asio::streambuf responseBuffer;
     std::string response;
@@ -33,6 +33,7 @@ struct Session {
     RequestCallbackFunc callback;
     bool cancel{false};
     std::mutex cancelGuard;
+    std::mutex sessionWrite;
 };
 
 

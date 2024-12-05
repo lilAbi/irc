@@ -32,9 +32,12 @@ public:
     void close();
 
     //passive socket listening and updating
-    void listenOnPort(const std::string& ipAddress, unsigned short port, int requestID);
+    void sendMessage(int requestID, const std::string& message);
 
-    void sendRequest(const std::string& ipAddress, unsigned short port, int requestID, std::string payload);
+    //createSession
+    void createSession(int requestID);
+
+    //sendMessage
 
 private:
     void onRequestComplete(std::shared_ptr<Session> session);
@@ -43,7 +46,7 @@ private:
     std::jthread chatLogUpdateThread;
     boost::asio::io_service ioServiceContext;
     boost::asio::executor_work_guard<boost::asio::io_context::executor_type> workGuard;
-    std::mutex activeSessionGuard;
+    std::mutex activeSessionGuard; //control access to sessions
     std::map<int, std::shared_ptr<Session>> sessions;
     std::vector<std::unique_ptr<std::thread>> threads;
 };
